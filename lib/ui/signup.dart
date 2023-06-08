@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'home.dart';
 import 'login.dart';
 
 class Signup extends StatefulWidget {
@@ -25,46 +26,64 @@ class _SignupState extends State<Signup> {
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       body: Form(
         key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 30.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(height: 100),
               Text(
                 "Register",
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
+              const SizedBox(height: 10),
               Text(
                 "Create your account",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
+              const SizedBox(height: 35),
               TextFormField(
                 controller: _controllerUsername,
                 decoration: InputDecoration(
                   labelText: "Username",
                   prefixIcon: const Icon(Icons.person_outline),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                 ),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter username.";
+                  }
+
+                  return null;
+                },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerEmail,
                 decoration: InputDecoration(
                   labelText: "Email",
                   prefixIcon: const Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                 ),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter email.";
+                  }else if(!(value.contains('@') && value.contains('.'))){
+                    return "Invalid email";
+                  }
+                  return null;
+                },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerPassword,
                 obscureText: _obscurePassword,
@@ -80,14 +99,23 @@ class _SignupState extends State<Signup> {
                       icon: _obscurePassword
                           ? const Icon(Icons.visibility_outlined)
                           : const Icon(Icons.visibility_off_outlined)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                 ),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter password.";
+                  }else if(value.length < 8){
+                    return "Password must be at least 8 character.";
+                  }
+                  return null;
+                },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerConFirmPassword,
                 obscureText: _obscurePassword,
@@ -103,14 +131,23 @@ class _SignupState extends State<Signup> {
                       icon: _obscurePassword
                           ? const Icon(Icons.visibility_outlined)
                           : const Icon(Icons.visibility_off_outlined)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                 ),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter password.";
+                  }else if(value != _controllerPassword.text){
+                    return "Password doesn't match.";
+                  }
+                  return null;
+                },
               ),
+              const SizedBox(height: 50),
               Column(
                 children: [
                   ElevatedButton(
@@ -120,7 +157,19 @@ class _SignupState extends State<Signup> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      _formKey.currentState?.save();
+                      if (_formKey.currentState?.validate() ?? false) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return Home(name: _controllerUsername.text);
+                            },
+                          ),
+                        );
+                      }
+                    },
                     child: const Text("Register"),
                   ),
                   Row(
@@ -149,5 +198,14 @@ class _SignupState extends State<Signup> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controllerUsername.dispose();
+    _controllerEmail.dispose();
+    _controllerPassword.dispose();
+    _controllerConFirmPassword.dispose();
+    super.dispose();
   }
 }

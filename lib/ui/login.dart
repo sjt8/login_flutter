@@ -22,34 +22,42 @@ class _LoginState extends State<Login> {
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       body: Form(
         key: _formKey,
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(30.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(height: 150),
               Text(
                 "Welcome back",
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
+              const SizedBox(height: 10),
               Text(
                 "Login to your account",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 60),
               TextFormField(
                 controller: _controllerUsername,
                 decoration: InputDecoration(
                   labelText: "Username",
                   prefixIcon: const Icon(Icons.person_outline),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                 ),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter username.";
+                  }
+
+                  return null;
+                },
               ),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerPassword,
                 obscureText: _obscurePassword,
@@ -65,15 +73,22 @@ class _LoginState extends State<Login> {
                       icon: _obscurePassword
                           ? const Icon(Icons.visibility_outlined)
                           : const Icon(Icons.visibility_off_outlined)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                 ),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter password.";
+                  }
+
+                  return null;
+                },
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 60),
               Column(
                 children: [
                   ElevatedButton(
@@ -84,14 +99,16 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return const Home(name: "hai");
-                          },
-                        ),
-                      );
+                      if(_formKey.currentState?.validate() ?? false){
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return Home(name: _controllerUsername.text);
+                            },
+                          ),
+                        );
+                      }
                     },
                     child: const Text("Login"),
                   ),

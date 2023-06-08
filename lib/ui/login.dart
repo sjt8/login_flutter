@@ -15,6 +15,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey();
+
+  final FocusNode _focusNodePassword = FocusNode();
   final TextEditingController _controllerUsername = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
@@ -60,6 +62,7 @@ class _LoginState extends State<Login> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
+                onEditingComplete: () => _focusNodePassword.requestFocus(),
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter username.";
@@ -73,6 +76,7 @@ class _LoginState extends State<Login> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerPassword,
+                focusNode: _focusNodePassword,
                 obscureText: _obscurePassword,
                 keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
@@ -164,6 +168,7 @@ class _LoginState extends State<Login> {
 
   @override
   void dispose() {
+    _focusNodePassword.dispose();
     _controllerUsername.dispose();
     _controllerPassword.dispose();
     super.dispose();

@@ -50,6 +50,7 @@ class Home extends StatelessWidget {
               "Welcome 🎉",
               style: Theme.of(context).textTheme.bodyLarge,
             ),
+            const SizedBox(height: 10),
             Text(
               _boxLogin.get("userName"),
               style: Theme.of(context).textTheme.headlineLarge,

@@ -11,6 +11,9 @@ class Signup extends StatefulWidget {
 class _SignupState extends State<Signup> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
+  final FocusNode _focusNodeEmail = FocusNode();
+  final FocusNode _focusNodePassword = FocusNode();
+  final FocusNode _focusNodeConfirmPassword = FocusNode();
   final TextEditingController _controllerUsername = TextEditingController();
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -63,10 +66,12 @@ class _SignupState extends State<Signup> {
 
                   return null;
                 },
+                onEditingComplete: () => _focusNodeEmail.requestFocus(),
               ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerEmail,
+                focusNode: _focusNodeEmail,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: "Email",
@@ -86,11 +91,13 @@ class _SignupState extends State<Signup> {
                   }
                   return null;
                 },
+                onEditingComplete: () => _focusNodePassword.requestFocus(),
               ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerPassword,
                 obscureText: _obscurePassword,
+                focusNode: _focusNodePassword,
                 keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
                   labelText: "Password",
@@ -119,11 +126,14 @@ class _SignupState extends State<Signup> {
                   }
                   return null;
                 },
+                onEditingComplete: () =>
+                    _focusNodeConfirmPassword.requestFocus(),
               ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerConFirmPassword,
                 obscureText: _obscurePassword,
+                focusNode: _focusNodeConfirmPassword,
                 keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
                   labelText: "Confirm Password",
@@ -211,6 +221,9 @@ class _SignupState extends State<Signup> {
 
   @override
   void dispose() {
+    _focusNodeEmail.dispose();
+    _focusNodePassword.dispose();
+    _focusNodeConfirmPassword.dispose();
     _controllerUsername.dispose();
     _controllerEmail.dispose();
     _controllerPassword.dispose();

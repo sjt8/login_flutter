@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'home.dart';
-import 'login.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -12,12 +10,14 @@ class Signup extends StatefulWidget {
 
 class _SignupState extends State<Signup> {
   final GlobalKey<FormState> _formKey = GlobalKey();
+
   final TextEditingController _controllerUsername = TextEditingController();
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
   final TextEditingController _controllerConFirmPassword =
       TextEditingController();
 
+  final Box _boxAccounts = Hive.box("accounts");
   bool _obscurePassword = true;
 
   @override
@@ -43,6 +43,7 @@ class _SignupState extends State<Signup> {
               const SizedBox(height: 35),
               TextFormField(
                 controller: _controllerUsername,
+                keyboardType: TextInputType.name,
                 decoration: InputDecoration(
                   labelText: "Username",
                   prefixIcon: const Icon(Icons.person_outline),
@@ -56,6 +57,8 @@ class _SignupState extends State<Signup> {
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter username.";
+                  } else if (_boxAccounts.containsKey(value)) {
+                    return "Username is already registered.";
                   }
 
                   return null;
@@ -64,6 +67,7 @@ class _SignupState extends State<Signup> {
               const SizedBox(height: 10),
               TextFormField(
                 controller: _controllerEmail,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: "Email",
                   prefixIcon: const Icon(Icons.email_outlined),
@@ -77,7 +81,7 @@ class _SignupState extends State<Signup> {
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter email.";
-                  }else if(!(value.contains('@') && value.contains('.'))){
+                  } else if (!(value.contains('@') && value.contains('.'))) {
                     return "Invalid email";
                   }
                   return null;
@@ -87,6 +91,7 @@ class _SignupState extends State<Signup> {
               TextFormField(
                 controller: _controllerPassword,
                 obscureText: _obscurePassword,
+                keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
                   labelText: "Password",
                   prefixIcon: const Icon(Icons.password_outlined),
@@ -109,7 +114,7 @@ class _SignupState extends State<Signup> {
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter password.";
-                  }else if(value.length < 8){
+                  } else if (value.length < 8) {
                     return "Password must be at least 8 character.";
                   }
                   return null;
@@ -119,6 +124,7 @@ class _SignupState extends State<Signup> {
               TextFormField(
                 controller: _controllerConFirmPassword,
                 obscureText: _obscurePassword,
+                keyboardType: TextInputType.visiblePassword,
                 decoration: InputDecoration(
                   labelText: "Confirm Password",
                   prefixIcon: const Icon(Icons.password_outlined),
@@ -141,7 +147,7 @@ class _SignupState extends State<Signup> {
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter password.";
-                  }else if(value != _controllerPassword.text){
+                  } else if (value != _controllerPassword.text) {
                     return "Password doesn't match.";
                   }
                   return null;
@@ -158,16 +164,28 @@ class _SignupState extends State<Signup> {
                       ),
                     ),
                     onPressed: () {
-                      _formKey.currentState?.save();
                       if (_formKey.currentState?.validate() ?? false) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return Home(name: _controllerUsername.text);
-                            },
+                        _boxAccounts.put(
+                          _controllerUsername.text,
+                          _controllerConFirmPassword.text,
+                        );
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            width: 200,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            content: const Text("Registered Successfully"),
                           ),
                         );
+
+                        _formKey.currentState?.reset();
+
+                        Navigator.pop(context);
                       }
                     },
                     child: const Text("Register"),
@@ -177,16 +195,7 @@ class _SignupState extends State<Signup> {
                     children: [
                       const Text("Already have an account?"),
                       TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return const Login();
-                              },
-                            ),
-                          );
-                        },
+                        onPressed: () => Navigator.pop(context),
                         child: const Text("Login"),
                       ),
                     ],
